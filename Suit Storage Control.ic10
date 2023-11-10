@@ -1,0 +1,53 @@
+#Suit Storage Control By Tagomizer
+
+#header
+alias storage1 d0
+alias storage2 d1
+alias regulator1 d2
+alias regulator2 d3
+alias display1 d4
+alias display2 d5
+
+alias suit1 r1
+alias suit2 r2
+alias suit1O2 r3
+alias suit1lowO2 r4
+alias regon1 r5
+alias suit2O2 r6
+alias suit2lowO2 r7
+alias regon2 r8
+alias charge1 r9
+alias charge2 r10
+
+define targetpressure 8000
+
+#init
+s regulator1 Setting 8000
+s regulator2 Setting 8000
+s display1 Mode 1
+s display2 Mode 1
+#main
+start:
+
+#suit storage 1
+ls suit1 storage1 1 Occupied
+s storage1 On suit1
+s display1 On suit1
+ls charge1 storage1 1 ChargeRatio
+s display1 Setting charge1
+ls suit1O2 storage1 1 PressureAir
+slt suit1lowO2 suit1O2 8000
+and regon1 suit1lowO2 suit1
+s regulator1 On regon1
+
+#suit storage 2
+ls suit2 storage2 1 Occupied
+s storage2 On suit2
+s display2 On suit2
+ls charge2 storage2 1 ChargeRatio
+s display2 Setting charge2
+ls suit2O2 storage2 1 PressureAir
+slt suit2lowO2 suit2O2 8000
+and regon2 suit2lowO2 suit1
+s regulator2 On regon2
+j start

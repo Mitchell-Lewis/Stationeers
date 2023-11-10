@@ -1,0 +1,37 @@
+#Aircon Controller By Thagomizer
+
+#header
+alias aircon db
+alias sensor d0
+
+alias temp r0
+alias activate r1
+
+define maxtemp 303
+define targettemp 298
+define mintemp 293
+
+#init
+s aircon Setting targettemp
+move activate 0
+
+#main loop
+start:
+l temp sensor Temperature
+sgt activate temp maxtemp
+slt activate temp mintemp
+s aircon Mode activate
+beqal temp targettemp off
+j start
+
+#off condition
+off:
+move activate 0
+j ra
+
+
+
+
+
+
+

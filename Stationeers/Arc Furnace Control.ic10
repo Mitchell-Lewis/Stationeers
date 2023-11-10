@@ -1,0 +1,15 @@
+#Arc Furnace Automation By Thagomizer
+
+#header
+alias furnace d0
+alias oreIn r0
+
+
+#main
+start:
+s furnace ClearMemory 1
+yield
+l oreIn furnace ImportCount
+beqz oreIn start
+s furnace Activate 1
+j start

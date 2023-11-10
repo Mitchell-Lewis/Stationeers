@@ -1,0 +1,64 @@
+# GFG Control V1 By Thagomizer
+
+#header
+alias sensor d0
+alias fuel d1
+alias startbutton d2
+alias stopbutton d3
+
+alias temperature r1
+alias charge r0
+define pumps 1310794736
+define starttemp 280
+define MAXTEMP 310
+define MINTEMP 290
+
+define generator 1165997963
+define battery -400115994
+
+#main
+
+startup:
+s db Setting 0 #sets housing state for debuging
+move charge 0
+move r2 0 #blanks register
+move r4 0 #blanks register
+move r5 0 #blanks register
+sb pumps On 0 #Make sure pumps are off
+lb charge battery Ratio Minimum
+l r2 startbutton Activate #checks start button
+ble charge 0.25 crank
+blez r2 startup #loops if button not pressed
+
+crank:
+s db Setting 1 #sets housing state for debuging
+s fuel On 1 #turns on fuel
+sb generator On 1 #turns on generator
+yield
+l r4 stopbutton Activate #checks stop button
+beq r4 1 shutdown #go to shutdown if button pressed
+l temperature sensor Temperature #reads temp
+blt temperature starttemp crank #loop to start
+
+cooling:
+s db Setting 2 #sets housing state for debuging
+l temperature sensor Temperature #reads temp
+lb charge battery Ratio Minimum
+sgt r3 temperature starttemp #stores on/off signal
+sb pumps On r3 #turns on pumps
+l r4 stopbutton Activate #read stop button
+beq r4 1 shutdown #go to shutdown if button pressed
+lb r5 generator On Sum #checks if generator stalled
+beq r5 0 shutdown #run shutdown if gen stalled
+bge charge 6 shutdown
+j cooling #loops if temp to high
+
+shutdown:
+s db Setting 3 #sets housing state for debuging
+move r5 0 #blanks register
+move r4 0 #blanks register
+sb generator On 0 #turn off generator
+s fuel On 0 #turn off fuel
+sb pumps On 0 #turn off pumps
+j startup #return to startup
+end:

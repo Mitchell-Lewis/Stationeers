@@ -1,0 +1,70 @@
+#base Controller V2 By Thagomizer
+
+#header
+alias display d0
+alias sensor d1
+alias airvent d2
+alias switch d3
+alias gen d4
+alias light d5
+
+alias charge r0
+alias flash r1
+alias pressure r2
+alias ventOn r3
+alias switchOn r4
+
+define battery -400115994
+
+#init
+s display Mode 1
+brdse light 10
+#main
+
+start:
+#battery Regulation
+s db Setting 0
+lb charge battery Ratio 1
+s display Setting charge
+sle flash charge 0.20
+s light On flash 
+bleal charge 0.25 genOn
+beqal charge 1.0 genOff
+
+#Pressure regulation
+s db Setting 1
+l switchOn switch Setting
+s airvent Lock switchOn
+beqz switchOn start
+l pressure sensor Pressure
+bltal pressure 99 low
+bgtal pressure 101 high
+bgtal pressure 100 off
+j start
+
+low:
+s db Setting 2
+s airvent Mode 0
+s airvent On 1
+j ra
+
+high:
+s db Setting 3
+s airvent Mode 1
+s airvent On 1
+j ra
+
+off:
+s db Setting 4
+s airvent On 0
+j ra
+
+genOff:
+s db Setting 5
+s gen On 0
+j ra
+
+genOn:
+s db Setting 6
+s gen On 1
+j ra
