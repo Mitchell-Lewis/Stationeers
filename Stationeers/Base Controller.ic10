@@ -19,9 +19,10 @@ define battery -400115994
 #init
 s display Mode 1
 brdse light 10
-#main
 
+#main
 start:
+
 #battery Regulation
 s db Setting 0
 lb charge battery Ratio 1
