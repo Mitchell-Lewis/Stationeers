@@ -25,7 +25,7 @@ start:
 
 #battery Regulation
 s db Setting 0
-lb charge battery Ratio 1
+lb charge battery Ratio Minimum
 s display Setting charge
 sle flash charge 0.20
 s light On flash 
