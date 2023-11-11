@@ -1,0 +1,27 @@
+#Pipe Temp Monitor By Thagomizer
+
+#header
+alias heater1 d0
+alias heater2 d1
+alias analizer1 d2
+alias analizer2 d3
+
+alias co2 r0
+alias fuel r1
+alias on1 r2
+alias on2 r3
+
+define mintemp 220
+
+#main
+
+start:
+l co2 analizer1 Temperature
+l fuel analizer2 Temperature
+
+sle on1 co2 mintemp
+sle on2 fuel mintemp
+s heater1 On on1
+s heater2 On on2
+j start
+ 
