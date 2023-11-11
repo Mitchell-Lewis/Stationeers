@@ -17,6 +17,11 @@ alias fuelon r5
 
 define mintemp 220
 
+#init
+s CoolantAnalizer1 On 1
+s CoolantAnalizer2 On 1
+s FuelAnalizer On 1
+
 #main
 
 start:
