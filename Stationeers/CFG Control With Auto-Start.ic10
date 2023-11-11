@@ -5,60 +5,64 @@ alias sensor d0
 alias fuel d1
 alias startbutton d2
 alias stopbutton d3
+alias dial d4
 
-alias temperature r1
-alias charge r0
+alias temperature r0
+alias charge r1
+alias pumpOn r2
+alias fuelsetting r3
+
 define pumps 1310794736
+define generator 1165997963
+define battery -400115994
+
 define starttemp 280
 define MAXTEMP 310
 define MINTEMP 290
 
-define generator 1165997963
-define battery -400115994
+#init
+sb pumps Setting 100
+s dial Mode 10
 
 #main
+start:
+s fuel On 0
+sb generator On 0
+brdns dial 3
+l fuelsetting dial Setting 
+s fuel Setting fuelsetting
+l r4 startbutton Activate
+lb charge battery Ratio Minimum
+l temperature sensor Temperature
+beq r4 1 startup
+beq charge 0.20 startup
+j start
 
 startup:
-s db Setting 0 #sets housing state for debuging
-move charge 0
-move r2 0 #blanks register
-move r4 0 #blanks register
-move r5 0 #blanks register
-sb pumps On 0 #Make sure pumps are off
-lb charge battery Ratio Minimum
-l r2 startbutton Activate #checks start button
-ble charge 0.25 crank
-blez r2 startup #loops if button not pressed
+l temperature sensor Temperature
+l r5 stopbutton Activate
+beq r5 1 start
+sgt pumpOn temperature starttemp
+sb pumps On pumpOn
+ble temperature starttemp crank
+j startup
 
 crank:
-s db Setting 1 #sets housing state for debuging
-s fuel On 1 #turns on fuel
-sb generator On 1 #turns on generator
-yield
-l r4 stopbutton Activate #checks stop button
-beq r4 1 shutdown #go to shutdown if button pressed
-l temperature sensor Temperature #reads temp
-blt temperature starttemp crank #loop to start
+l r5 stopbutton Activate
+beq r5 1 start
+s fuel On 1
+l temperature sensor Temperature
+bgt temperature MAXTEMP start
+sb generator On 1
+sleep 2
+lb r6 generator On Sum
+beq r6 0 crank
 
 cooling:
-s db Setting 2 #sets housing state for debuging
-l temperature sensor Temperature #reads temp
+sge pumpOn temperature starttemp
+sb pumps On pumpOn
+l r5 stopbutton Activate
+beq r5 1 start
 lb charge battery Ratio Minimum
-sgt r3 temperature starttemp #stores on/off signal
-sb pumps On r3 #turns on pumps
-l r4 stopbutton Activate #read stop button
-beq r4 1 shutdown #go to shutdown if button pressed
-lb r5 generator On Sum #checks if generator stalled
-beq r5 0 shutdown #run shutdown if gen stalled
-bge charge 6 shutdown
-j cooling #loops if temp to high
-
-shutdown:
-s db Setting 3 #sets housing state for debuging
-move r5 0 #blanks register
-move r4 0 #blanks register
-sb generator On 0 #turn off generator
-s fuel On 0 #turn off fuel
-sb pumps On 0 #turn off pumps
-j startup #return to startup
-end:
+beq charge 1.0 start
+j cooling
