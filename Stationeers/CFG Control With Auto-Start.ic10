@@ -6,11 +6,13 @@ alias fuel d1
 alias startbutton d2
 alias stopbutton d3
 alias dial d4
+alias heater d5
 
 alias temperature r0
 alias charge r1
 alias pumpOn r2
 alias fuelsetting r3
+alias heaterOn r4
 
 define pumps 1310794736
 define generator 1165997963
@@ -26,43 +28,51 @@ s dial Mode 10
 
 #main
 start:
+move r5 0
+move r6 0
+move r7 0
 s fuel On 0
 sb generator On 0
+s heater On 0
+sb pumps On 0
 brdns dial 3
 l fuelsetting dial Setting 
 s fuel Setting fuelsetting
-l r4 startbutton Activate
+l r5 startbutton Activate
 lb charge battery Ratio Minimum
 l temperature sensor Temperature
-beq r4 1 startup
+beq r5 1 startup
 beq charge 0.20 startup
 j start
 
 startup:
 l temperature sensor Temperature
-l r5 stopbutton Activate
-beq r5 1 start
+l r6 stopbutton Activate
+beq r6 1 start
+brdns heater 3
+slt heaterOn temperature MINTEMP
+s heater On 1
 sgt pumpOn temperature starttemp
 sb pumps On pumpOn
 ble temperature starttemp crank
 j startup
 
 crank:
-l r5 stopbutton Activate
-beq r5 1 start
+l r6 stopbutton Activate
+beq r6 1 start
 s fuel On 1
 l temperature sensor Temperature
 bgt temperature MAXTEMP start
 sb generator On 1
 sleep 2
-lb r6 generator On Sum
-beq r6 0 crank
+lb r7 generator On Sum
+beq r7 0 crank
 
 cooling:
 sge pumpOn temperature starttemp
 sb pumps On pumpOn
-l r5 stopbutton Activate
-beq r5 1 start
+l r6 stopbutton Activate
+beq r6 1 start
 lb charge battery Ratio Minimum
 beq charge 1.0 start
 j cooling
