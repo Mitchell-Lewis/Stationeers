@@ -17,26 +17,29 @@ alias heaterOn r4
 define pumps 1310794736
 define generator 1165997963
 define battery -400115994
+define monitors 801677497
 
 define starttemp 280
 define MAXTEMP 310
-define MINTEMP 290
 
 #init
-sb pumps Setting 100
+bdns dial start
 s dial Mode 10
 
 #main
 start:
+sb monitors On 0
 move r5 0
 move r6 0
 move r7 0
+sb pumps Setting 30
 s fuel On 0
 sb generator On 0
+brdns heater 2
 s heater On 0
 sb pumps On 0
 brdns dial 3
-l fuelsetting dial Setting 
+l fuelsetting dial Setting
 s fuel Setting fuelsetting
 l r5 startbutton Activate
 lb charge battery Ratio Minimum
@@ -46,12 +49,14 @@ beq charge 0.20 startup
 j start
 
 startup:
+sb monitors On 1
+sb pumps Setting 100
 l temperature sensor Temperature
 l r6 stopbutton Activate
 beq r6 1 start
 brdns heater 3
-slt heaterOn temperature MINTEMP
-s heater On 1
+slt heaterOn temperature starttemp
+s heater On heaterOn
 sgt pumpOn temperature starttemp
 sb pumps On pumpOn
 ble temperature starttemp crank
