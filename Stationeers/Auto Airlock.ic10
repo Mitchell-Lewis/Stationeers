@@ -1,0 +1,82 @@
+#Auto Airlock by Thagomizer
+#v1.0
+
+alias osensor d0
+alias gsensor d1
+alias extdoor d2
+alias intdoor d3
+alias intvent d4
+alias extvent d5
+
+alias player r0
+alias pressure r1
+alias extdooropen r2
+alias intdooropen r3
+alias ext r4
+alias int r5
+
+define intpress 70
+define extpress 54
+
+
+idle:
+#resets airlock
+move ext 0
+move int 0
+s extvent On 0
+s intvent On 0
+#check if player is presant and which door is open
+l player osensor Occupied
+l extdooropen extdoor Open
+l intdooropen intdoor Open
+and ext player extdooropen
+and int player intdooropen
+beq ext 1 in
+beq int 1 out
+
+j idle
+
+out:
+#set interior vent and doors door closed
+s intdoor Open 0
+s intdoor Open 0
+s extdoor Open 0
+#Set exterior vent closed and pump out int gas
+s extvent On 0
+s intvent Mode 1
+s intvent On 1
+l pressure gsensor Pressure
+brnez pressure -1
+#set interior vent closed and pump in ext gas
+s intvent On 0
+s extvent Mode 0
+s extvent On 1 
+l pressure gsensor Pressure
+brne pressure extpress -1
+s extvent On 0
+#open exterior door
+s extdoor Open 1
+#sleep to prevent immediate recycling
+sleep 3
+#jump to start
+j idle
+
+in:
+#set interior vent and exterior door closed
+s intdoor Open 0
+s extdoor Open 0
+#Set interior vent closed and pump out ext gas
+s intvent On 0
+s extvent Mode 1
+s extvent On 1
+l pressure gsensor Pressure
+brnez pressure -1
+#set exterior vent closed and pump in int gas
+s extvent On 0
+s intvent Mode 0
+s int vent On 1
+l pressure gsensor Pressure
+brne pressure intpress -1
+s intdoor Open 1
+sleep 3
+j idle
