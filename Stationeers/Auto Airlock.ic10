@@ -2,11 +2,11 @@
 #v1.0
 
 alias osensor d0
-alias gsensor d1
-alias extdoor d2
-alias intdoor d3
-alias intvent d4
-alias extvent d5
+alias extdoor d1
+alias intdoor d2
+alias intvent d3
+alias extvent d4
+alias stopbutton d5
 
 alias player r0
 alias pressure r1
@@ -14,6 +14,7 @@ alias extdooropen r2
 alias intdooropen r3
 alias ext r4
 alias int r5
+alias buttonactivate r6
 
 define intpress 70
 define extpress 54
@@ -45,16 +46,21 @@ s extdoor Open 0
 s extvent On 0
 s intvent Mode 1
 s intvent On 1
-l pressure gsensor Pressure
-brnez pressure -1
+l pressure intvent PressureExternal
+l buttonactivate stopbutton Activate
+breq buttonactivate 1 extdooropen
+brnez pressure -3
 #set interior vent closed and pump in ext gas
 s intvent On 0
 s extvent Mode 0
 s extvent On 1 
-l pressure gsensor Pressure
-brne pressure extpress -1
+l pressure intvent PressureExternal
+l buttonactivate stopbutton Activate
+breq buttonactivate 1 extdooropen 
+brne pressure extpress -3
 s extvent On 0
 #open exterior door
+extdooropen:
 s extdoor Open 1
 #sleep to prevent immediate recycling
 sleep 3
@@ -69,14 +75,19 @@ s extdoor Open 0
 s intvent On 0
 s extvent Mode 1
 s extvent On 1
-l pressure gsensor Pressure
-brnez pressure -1
+l pressure intvent PressureExternal 
+l buttonactivate stopbutton Activate
+breq buttonactivate 1 intdooropen
+brnez pressure -3
 #set exterior vent closed and pump in int gas
 s extvent On 0
 s intvent Mode 0
 s int vent On 1
-l pressure gsensor Pressure
-brne pressure intpress -1
+l pressure intvent PressureExternal
+l buttonactivate stopbutton Activate
+breq buttonactivate 1 intdooropen
+brne pressure intpress -3
+intdooropen:
 s intdoor Open 1
 sleep 3
 j idle
