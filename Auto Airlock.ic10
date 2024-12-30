@@ -18,6 +18,7 @@ alias buttonactivate r6
 
 define intpress 70
 define extpress 54
+define light -186006465
 
 
 idle:
@@ -32,6 +33,7 @@ l extdooropen extdoor Open
 l intdooropen intdoor Open
 and ext player extdooropen
 and int player intdooropen
+sb light On player
 beq ext 1 in
 beq int 1 out
 
